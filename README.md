@@ -1,13 +1,13 @@
 # SQL-Arbeitsblatt: Aggregatfunktionen
 
-**Datenbank:** `schule.db`  
+**Datenbank:** `schule.db` – öffne die Datei direkt mit *DB Browser for SQLite*  
 **Thema:** Aggregatfunktionen und `GROUP BY`
 
 ---
 
 ## Die Ausgangssituation
 
-Unser Schulsystem speichert Daten in folgenden Tabellen:
+Unsere Schuldatenbank enthält folgende Tabellen:
 
 | Tabelle | Inhalt |
 |---|---|
@@ -18,23 +18,20 @@ Unser Schulsystem speichert Daten in folgenden Tabellen:
 | `produkte` | Kantinenangebot mit Preis und Kategorie |
 | `bestellungen` | Jede Bestellung eines Schülers in der Kantine |
 
-**Kurzübersicht der Tabellenstruktur:**
-
 ```
-schueler(schueler_id, vorname, nachname, klasse_id, ...)
+schueler(schueler_id, vorname, nachname, klasse_id, geburtsdatum, geschlecht)
 noten(noten_id, schueler_id, fach_id, note, datum, art)
 bestellungen(bestell_id, schueler_id, produkt_id, datum, menge)
 produkte(produkt_id, name, kategorie, preis)
 klassen(klasse_id, bezeichnung, stufe, klassenlehrer)
+faecher(fach_id, name, kuerzel)
 ```
 
 ---
 
 ## 1. Das Problem – Was ohne Aggregation nicht geht
 
-### Aufgabe
-
-Du willst wissen: **„Wie viel hat jeder Schüler insgesamt in der Kantine ausgegeben?"**
+Du willst wissen: **"Wie viel hat jeder Schüler insgesamt in der Kantine ausgegeben?"**
 
 Dein erster Versuch:
 
@@ -52,35 +49,16 @@ schueler_id | preis
 1           | 3.50
 1           | 1.20
 1           | 4.20
-1           | 0.80
 ...
 ```
 
-**Das Problem:** Eine normale `SELECT`-Abfrage zeigt dir *Einzelwerte*. Du kannst damit nicht automatisch zusammenrechnen, zählen oder den Durchschnitt bilden. Dafür brauchst du **Aggregatfunktionen**.
+Eine normale `SELECT`-Abfrage zeigt dir *Einzelwerte*. Um zusammenzurechnen, zu zählen oder den Durchschnitt zu bilden, brauchst du **Aggregatfunktionen**.
 
 ---
 
-## 2. Aggregatfunktionen – Überblick
+## 2. `COUNT` – Wie viele?
 
-Aggregatfunktionen fassen **mehrere Zeilen zu einem einzigen Ergebniswert** zusammen.
-
-| Funktion | Bedeutung | Beispiel |
-|---|---|---|
-| `COUNT(...)` | Anzahl der Zeilen | Wie viele Bestellungen? |
-| `SUM(...)` | Summe aller Werte | Gesamtumsatz der Kantine |
-| `AVG(...)` | Durchschnitt der Werte | Durchschnittsnote in Mathe |
-| `MIN(...)` | Kleinster Wert | Billigstes Produkt |
-| `MAX(...)` | Größter Wert | Teuerste Bestellung |
-
----
-
-## 3. Die Funktionen im Einsatz
-
-### 3.1 `COUNT` – Wie viele?
-
-`COUNT(*)` zählt alle Zeilen. `COUNT(spalte)` zählt alle Zeilen, in denen die Spalte **nicht leer** ist.
-
-**Beispiel A:** Wie viele Schüler sind in der Datenbank gespeichert?
+`COUNT(*)` zählt alle Zeilen eines Ergebnisses.
 
 ```sql
 SELECT COUNT(*) AS anzahl_schueler
@@ -91,7 +69,7 @@ FROM schueler;
 |---|
 | 20 |
 
-**Beispiel B:** Wie viele Bestellungen hat Leon (schueler_id = 1) aufgegeben?
+Du kannst `COUNT` auch mit `WHERE` kombinieren:
 
 ```sql
 SELECT COUNT(*) AS anzahl_bestellungen
@@ -103,11 +81,30 @@ WHERE schueler_id = 1;
 |---|
 | 8 |
 
+### Aufgabe 1
+
+Wie viele Schülerinnen (Geschlecht = `'w'`) sind in der Datenbank gespeichert?
+
+```sql
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT COUNT(*) AS anzahl_schülerinnen
+FROM schueler
+WHERE geschlecht = 'w';
+```
+</details>
+
 ---
 
-### 3.2 `SUM` – Wie viel insgesamt?
+## 3. `SUM` – Wie viel insgesamt?
 
-**Beispiel:** Wie viel hat Leon insgesamt in der Kantine ausgegeben?
+`SUM(spalte)` addiert alle Werte einer Spalte. Die Spalte `menge` in `bestellungen` gibt an, wie oft ein Produkt pro Bestellung gekauft wurde.
 
 ```sql
 SELECT SUM(produkte.preis * bestellungen.menge) AS gesamtausgabe
@@ -120,13 +117,30 @@ WHERE bestellungen.schueler_id = 1;
 |---|
 | 16.50 |
 
-> **Hinweis:** Die Spalte `menge` berücksichtigt, wie oft ein Produkt pro Bestellung gekauft wurde.
+### Aufgabe 2
+
+Berechne den Gesamtumsatz der Kantine über **alle** Bestellungen.
+
+```sql
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT ROUND(SUM(produkte.preis * bestellungen.menge), 2) AS gesamtumsatz
+FROM bestellungen
+JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id;
+```
+</details>
 
 ---
 
-### 3.3 `AVG` – Was ist der Durchschnitt?
+## 4. `AVG` – Was ist der Durchschnitt?
 
-**Beispiel:** Was ist Leonidas' Durchschnittsnote in allen Fächern?
+`AVG(spalte)` berechnet den Mittelwert aller Werte in einer Spalte.
 
 ```sql
 SELECT AVG(note) AS durchschnittsnote
@@ -138,11 +152,33 @@ WHERE schueler_id = 1;
 |---|
 | 2.0 |
 
+> **Tipp:** Mit `ROUND(AVG(...), 2)` rundet man das Ergebnis auf 2 Nachkommastellen.
+
+### Aufgabe 3
+
+Berechne den Notendurchschnitt von Sophie Wagner (`schueler_id = 2`) **nur im Fach Mathematik** (`fach_id = 1`).
+
+```sql
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT AVG(note) AS durchschnitt
+FROM noten
+WHERE schueler_id = 2
+  AND fach_id = 1;
+```
+</details>
+
 ---
 
-### 3.4 `MIN` und `MAX` – Extremwerte
+## 5. `MIN` und `MAX` – Extremwerte
 
-**Beispiel:** Was ist das billigste und das teuerste Produkt in der Kantine?
+`MIN(spalte)` liefert den kleinsten, `MAX(spalte)` den größten Wert.
 
 ```sql
 SELECT MIN(preis) AS guenstigstes,
@@ -154,67 +190,86 @@ FROM produkte;
 |---|---|
 | 0.80 | 4.20 |
 
+### Aufgabe 4
+
+Welche beste und welche schlechteste Note wurde in der gesamten `noten`-Tabelle vergeben?  
+*(In Deutschland ist 1 die beste Note.)*
+
+```sql
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT MIN(note) AS beste_note,
+       MAX(note) AS schlechteste_note
+FROM noten;
+```
+</details>
+
 ---
 
-## 4. `GROUP BY` – Für jede Gruppe ein Ergebnis
+## 6. `GROUP BY` – Für jede Gruppe ein Ergebnis
 
-Bisher haben alle Aggregatfunktionen **eine einzige Zahl** für die gesamte Tabelle berechnet. Mit `GROUP BY` kannst du die Daten **in Gruppen aufteilen** und für jede Gruppe separat aggregieren.
+Bisher haben alle Aggregatfunktionen **einen einzigen Wert** für die gesamte Tabelle geliefert. Mit `GROUP BY` teilst du die Daten in **Gruppen** auf und bekommst für jede Gruppe ein eigenes Ergebnis.
 
-### Syntax
-
+**Syntax:**
 ```sql
 SELECT gruppierungsspalte, AGGREGATFUNKTION(spalte)
 FROM tabelle
 GROUP BY gruppierungsspalte;
 ```
 
-**Regel:** Alle Spalten im `SELECT`, die *keine* Aggregatfunktion sind, **müssen** in `GROUP BY` stehen.
+> **Regel:** Alle Spalten im `SELECT`, die *keine* Aggregatfunktion sind, **müssen** auch in `GROUP BY` stehen.
 
----
-
-### 4.1 Gesamtausgabe jedes Schülers
+**Beispiel:** Gesamtausgabe jedes Schülers in der Kantine:
 
 ```sql
 SELECT schueler_id,
-       SUM(produkte.preis * bestellungen.menge) AS gesamtausgabe
+       ROUND(SUM(produkte.preis * bestellungen.menge), 2) AS gesamtausgabe
 FROM bestellungen
 JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
 GROUP BY bestellungen.schueler_id;
 ```
 
-| schueler_id | gesamtausgabe |
-|---|---|
-| 1 | 16.50 |
-| 2 | 11.30 |
-| 3 | 15.40 |
-| ... | ... |
+```
+schueler_id | gesamtausgabe
+------------|-------------
+1           | 16.50
+2           | 11.30
+3           | 15.40
+...
+```
 
 Jetzt bekommt jeder Schüler **eine eigene Zeile** mit seiner persönlichen Gesamtsumme.
 
----
+### Aufgabe 5
 
-### 4.2 Durchschnittsnote pro Fach
+Zeige für jede Klasse die Anzahl der Schüler. Nutze die Tabelle `schueler` und gruppiere nach `klasse_id`.
 
 ```sql
-SELECT fach_id,
-       AVG(note) AS durchschnitt,
-       MIN(note) AS beste_note,
-       MAX(note) AS schlechteste_note
-FROM noten
-GROUP BY fach_id;
+-- Deine Lösung:
+
 ```
 
-| fach_id | durchschnitt | beste_note | schlechteste_note |
-|---|---|---|---|
-| 1 | 2.75 | 1.0 | 5.0 |
-| 2 | 2.70 | 1.0 | 5.0 |
-| ... | ... | ... | ... |
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT klasse_id, COUNT(*) AS anzahl_schueler
+FROM schueler
+GROUP BY klasse_id;
+```
+</details>
 
 ---
 
-### 4.3 Lesbare Ausgabe mit JOIN
+## 7. `GROUP BY` mit `JOIN` – Lesbare Ausgabe
 
-Statt der `fach_id` kann man den Fachnamen anzeigen, indem man mit `faecher` joined:
+Statt einer ID kann man mit einem `JOIN` den echten Namen anzeigen.
 
 ```sql
 SELECT faecher.name AS fach,
@@ -229,60 +284,36 @@ GROUP BY noten.fach_id;
 | Mathematik | 2.75 |
 | Deutsch | 2.65 |
 | Englisch | 2.65 |
-| Informatik | 2.5 |
+| Informatik | 2.50 |
 
-> **`ROUND(wert, 2)`** rundet auf 2 Nachkommastellen.
+### Aufgabe 6
 
----
-
-### 4.4 Anzahl Bestellungen pro Schüler mit Name
+Zeige für jede Klasse den **Klassennamen** (aus der Tabelle `klassen`) und die Anzahl der Schüler.
 
 ```sql
-SELECT schueler.vorname || ' ' || schueler.nachname AS name,
-       COUNT(*) AS anzahl_bestellungen
-FROM bestellungen
-JOIN schueler ON bestellungen.schueler_id = schueler.schueler_id
-GROUP BY bestellungen.schueler_id
-ORDER BY anzahl_bestellungen DESC;
+-- Deine Lösung:
+
 ```
 
-| name | anzahl_bestellungen |
-|---|---|
-| Leon Bauer | 8 |
-| Finn Schulz | 6 |
-| Luca Hoffmann | 6 |
-| ... | ... |
-
----
-
-### 4.5 Umsatz pro Produktkategorie
+<details>
+<summary>Lösung</summary>
 
 ```sql
-SELECT kategorie,
-       COUNT(*) AS bestellungen,
-       SUM(preis * menge) AS umsatz
-FROM bestellungen
-JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
-GROUP BY kategorie
-ORDER BY umsatz DESC;
+SELECT klassen.bezeichnung, COUNT(*) AS anzahl_schueler
+FROM schueler
+JOIN klassen ON schueler.klasse_id = klassen.klasse_id
+GROUP BY schueler.klasse_id;
 ```
-
-| kategorie | bestellungen | umsatz |
-|---|---|---|
-| Hauptgericht | 62 | 224.80 |
-| Getränk | 28 | 32.90 |
-| Snack | 17 | 27.30 |
+</details>
 
 ---
 
-## 5. `HAVING` – Gruppen filtern
+## 8. `HAVING` – Gruppen filtern
 
 `WHERE` filtert **Zeilen** *vor* der Aggregation.  
 `HAVING` filtert **Gruppen** *nach* der Aggregation.
 
-> **Merksatz:** `WHERE` arbeitet mit Einzelwerten, `HAVING` mit Aggregatwerten.
-
-### Beispiel: Nur Fächer, in denen der Durchschnitt schlechter als 2,5 ist
+> `WHERE` arbeitet mit Einzelwerten – `HAVING` mit Aggregatwerten.
 
 ```sql
 SELECT faecher.name,
@@ -293,7 +324,22 @@ GROUP BY noten.fach_id
 HAVING AVG(note) > 2.5;
 ```
 
-### Beispiel: Schüler, die mehr als 5 Bestellungen aufgegeben haben
+Dieses Beispiel zeigt nur Fächer, deren Notendurchschnitt schlechter als 2,5 ist.
+
+> **Wichtig:** Im `HAVING` muss die Aggregatfunktion wiederholt werden – Alias-Namen aus dem `SELECT` funktionieren dort nicht, weil `HAVING` vor `SELECT` ausgewertet wird.
+
+### Aufgabe 7
+
+Zeige alle Schüler, die **mehr als 5 Bestellungen** in der Kantine aufgegeben haben.  
+Gib Vorname, Nachname und Anzahl der Bestellungen aus, sortiert nach Anzahl absteigend.
+
+```sql
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
 
 ```sql
 SELECT schueler.vorname || ' ' || schueler.nachname AS name,
@@ -304,178 +350,50 @@ GROUP BY bestellungen.schueler_id
 HAVING COUNT(*) > 5
 ORDER BY anzahl DESC;
 ```
-
----
-
-## 6. Verarbeitungsreihenfolge in SQL
-
-Eine SQL-Abfrage wird in dieser Reihenfolge verarbeitet – **nicht** so, wie sie geschrieben steht:
-
-```
-1. FROM / JOIN   → Welche Tabellen?
-2. WHERE         → Welche Zeilen?
-3. GROUP BY      → Gruppen bilden
-4. HAVING        → Gruppen filtern
-5. SELECT        → Was ausgeben?
-6. ORDER BY      → Sortierung
-7. LIMIT         → Anzahl begrenzen
-```
-
-Das erklärt, warum du in `HAVING` **keine Alias-Namen** aus dem `SELECT` verwenden kannst:
-
-```sql
--- ✗ Falsch: 'durchschnitt' ist beim HAVING noch nicht bekannt
-HAVING durchschnitt > 2.5
-
--- ✓ Richtig: Aggregatfunktion direkt wiederholen
-HAVING AVG(note) > 2.5
-```
-
----
-
-## 7. Aufgaben
-
-### Aufgabe 1 – COUNT
-Wie viele Schülerinnen (Geschlecht = `'w'`) sind in der Datenbank?
-
-```sql
--- Deine Lösung:
-
-```
-
----
-
-### Aufgabe 2 – SUM
-Berechne den Gesamtumsatz der Kantine über alle Bestellungen.
-
-```sql
--- Deine Lösung:
-
-```
-
----
-
-### Aufgabe 3 – AVG mit WHERE
-Berechne den Notendurchschnitt von Sophie Wagner (schueler_id = 2) in **Mathematik** (fach_id = 1).
-
-```sql
--- Deine Lösung:
-
-```
-
----
-
-### Aufgabe 4 – GROUP BY
-Zeige für jede Klasse (nach `klasse_id`) die Anzahl der Schüler an.
-
-```sql
--- Deine Lösung:
-
-```
-
----
-
-### Aufgabe 5 – GROUP BY mit JOIN
-Zeige für jede Klasse den **Klassennamen** (aus der Tabelle `klassen`) und die Anzahl der Schüler.
-
-```sql
--- Deine Lösung:
-
-```
-
----
-
-### Aufgabe 6 – HAVING
-Zeige alle Schüler an, deren Durchschnittsnote in der Tabelle `noten` besser als 2,0 ist (also kleiner als 2,0, da 1 die beste Note ist).  
-Gib Vorname, Nachname und den gerundeten Durchschnitt aus.
-
-```sql
--- Deine Lösung:
-
-```
-
----
-
-### Aufgabe 7 – Kombiniert
-Welche **Produkte** aus der Kantine wurden insgesamt am häufigsten bestellt?  
-Zeige Produktname und Gesamtmenge, sortiert nach Gesamtmenge absteigend. Zeige nur die Top 3.
-
-```sql
--- Deine Lösung:
-
-```
-
----
-
-## 8. Lösungen
-
-<details>
-<summary>Aufgabe 1</summary>
-
-```sql
-SELECT COUNT(*) AS anzahl_schülerinnen
-FROM schueler
-WHERE geschlecht = 'w';
-```
 </details>
 
-<details>
-<summary>Aufgabe 2</summary>
+---
+
+## 9. Kombinations-Aufgaben
+
+### Aufgabe 8
+
+Zeige für jede **Produktkategorie** den Gesamtumsatz und die Anzahl der Bestellungen.  
+Sortiere nach Umsatz absteigend.
 
 ```sql
-SELECT SUM(produkte.preis * bestellungen.menge) AS gesamtumsatz
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT kategorie,
+       COUNT(*) AS bestellungen,
+       ROUND(SUM(preis * menge), 2) AS umsatz
 FROM bestellungen
-JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id;
+JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
+GROUP BY kategorie
+ORDER BY umsatz DESC;
 ```
 </details>
 
-<details>
-<summary>Aufgabe 3</summary>
+---
+
+### Aufgabe 9
+
+Welche **drei Produkte** wurden insgesamt am häufigsten bestellt?  
+Zeige Produktname und Gesamtmenge, nur die Top 3.
 
 ```sql
-SELECT AVG(note) AS durchschnitt
-FROM noten
-WHERE schueler_id = 2
-  AND fach_id = 1;
+-- Deine Lösung:
+
 ```
-</details>
 
 <details>
-<summary>Aufgabe 4</summary>
-
-```sql
-SELECT klasse_id, COUNT(*) AS anzahl_schueler
-FROM schueler
-GROUP BY klasse_id;
-```
-</details>
-
-<details>
-<summary>Aufgabe 5</summary>
-
-```sql
-SELECT klassen.bezeichnung, COUNT(*) AS anzahl_schueler
-FROM schueler
-JOIN klassen ON schueler.klasse_id = klassen.klasse_id
-GROUP BY schueler.klasse_id;
-```
-</details>
-
-<details>
-<summary>Aufgabe 6</summary>
-
-```sql
-SELECT schueler.vorname, schueler.nachname,
-       ROUND(AVG(note), 2) AS durchschnitt
-FROM noten
-JOIN schueler ON noten.schueler_id = schueler.schueler_id
-GROUP BY noten.schueler_id
-HAVING AVG(note) < 2.0;
-```
-</details>
-
-<details>
-<summary>Aufgabe 7</summary>
+<summary>Lösung</summary>
 
 ```sql
 SELECT produkte.name,
@@ -485,5 +403,142 @@ JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
 GROUP BY bestellungen.produkt_id
 ORDER BY gesamtmenge DESC
 LIMIT 3;
+```
+</details>
+
+---
+
+### Aufgabe 10
+
+Zeige für jeden Schüler (Vorname, Nachname) seinen **Notendurchschnitt in jedem Fach** (Fachname).  
+Sortiere nach Nachname, dann nach Fach.
+
+```sql
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT schueler.vorname,
+       schueler.nachname,
+       faecher.name AS fach,
+       ROUND(AVG(noten.note), 2) AS durchschnitt
+FROM noten
+JOIN schueler ON noten.schueler_id = schueler.schueler_id
+JOIN faecher  ON noten.fach_id     = faecher.fach_id
+GROUP BY noten.schueler_id, noten.fach_id
+ORDER BY schueler.nachname, faecher.name;
+```
+</details>
+
+---
+
+### Aufgabe 11
+
+Zeige für jede Klasse (Klassenname) den Notendurchschnitt **aller Schüler dieser Klasse**.  
+Zeige nur Klassen, deren Durchschnitt besser als 2,8 ist (also kleiner als 2,8).
+
+```sql
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT klassen.bezeichnung,
+       ROUND(AVG(noten.note), 2) AS klassendurchschnitt
+FROM noten
+JOIN schueler ON noten.schueler_id = schueler.schueler_id
+JOIN klassen  ON schueler.klasse_id = klassen.klasse_id
+GROUP BY klassen.klasse_id
+HAVING AVG(noten.note) < 2.8;
+```
+</details>
+
+---
+
+## 10. Zum Grübeln
+
+### Aufgabe 12
+
+Welche Produkte kosten **mehr als der Durchschnittspreis** aller Produkte?  
+Gib Name und Preis aus.
+
+```sql
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT name, preis
+FROM produkte
+WHERE preis > (SELECT AVG(preis) FROM produkte);
+```
+</details>
+
+---
+
+### Aufgabe 13
+
+Welche Schülerinnen und Schüler haben einen **besseren Notendurchschnitt als der Gesamtdurchschnitt** aller Noten in der Datenbank?  
+Gib Vorname, Nachname und den persönlichen Durchschnitt aus.
+
+```sql
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT schueler.vorname,
+       schueler.nachname,
+       ROUND(AVG(noten.note), 2) AS durchschnitt
+FROM noten
+JOIN schueler ON noten.schueler_id = schueler.schueler_id
+GROUP BY noten.schueler_id
+HAVING AVG(noten.note) < (SELECT AVG(note) FROM noten);
+```
+</details>
+
+---
+
+### Aufgabe 14
+
+Welcher Schüler hat in der Kantine **am meisten Geld ausgegeben**?  
+Gib nur genau diesen einen Schüler mit seinem Namen und der Gesamtsumme aus.
+
+```sql
+-- Deine Lösung:
+
+```
+
+<details>
+<summary>Lösung</summary>
+
+```sql
+SELECT schueler.vorname || ' ' || schueler.nachname AS name,
+       ROUND(SUM(produkte.preis * bestellungen.menge), 2) AS gesamtausgabe
+FROM bestellungen
+JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
+JOIN schueler ON bestellungen.schueler_id = schueler.schueler_id
+GROUP BY bestellungen.schueler_id
+HAVING gesamtausgabe = (
+    SELECT MAX(summe) FROM (
+        SELECT SUM(produkte.preis * bestellungen.menge) AS summe
+        FROM bestellungen
+        JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
+        GROUP BY bestellungen.schueler_id
+    )
+);
 ```
 </details>
