@@ -65,10 +65,6 @@ SELECT COUNT(*) AS anzahl_schueler
 FROM schueler;
 ```
 
-| anzahl_schueler |
-|---|
-| 20 |
-
 Du kannst `COUNT` auch mit `WHERE` kombinieren:
 
 ```sql
@@ -76,10 +72,6 @@ SELECT COUNT(*) AS anzahl_bestellungen
 FROM bestellungen
 WHERE schueler_id = 1;
 ```
-
-| anzahl_bestellungen |
-|---|
-| 8 |
 
 ### Aufgabe 1
 
@@ -113,10 +105,6 @@ JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
 WHERE bestellungen.schueler_id = 1;
 ```
 
-| gesamtausgabe |
-|---|
-| 16.50 |
-
 ### Aufgabe 2
 
 Berechne den Gesamtumsatz der Kantine über **alle** Bestellungen.
@@ -147,10 +135,6 @@ SELECT AVG(note) AS durchschnittsnote
 FROM noten
 WHERE schueler_id = 1;
 ```
-
-| durchschnittsnote |
-|---|
-| 2.0 |
 
 > **Tipp:** Mit `ROUND(AVG(...), 2)` rundet man das Ergebnis auf 2 Nachkommastellen.
 
@@ -185,10 +169,6 @@ SELECT MIN(preis) AS guenstigstes,
        MAX(preis) AS teuerstes
 FROM produkte;
 ```
-
-| guenstigstes | teuerstes |
-|---|---|
-| 0.80 | 4.20 |
 
 ### Aufgabe 4
 
@@ -235,15 +215,6 @@ JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
 GROUP BY bestellungen.schueler_id;
 ```
 
-```
-schueler_id | gesamtausgabe
-------------|-------------
-1           | 16.50
-2           | 11.30
-3           | 15.40
-...
-```
-
 Jetzt bekommt jeder Schüler **eine eigene Zeile** mit seiner persönlichen Gesamtsumme.
 
 ### Aufgabe 5
@@ -278,13 +249,6 @@ FROM noten
 JOIN faecher ON noten.fach_id = faecher.fach_id
 GROUP BY noten.fach_id;
 ```
-
-| fach | durchschnitt |
-|---|---|
-| Mathematik | 2.75 |
-| Deutsch | 2.65 |
-| Englisch | 2.65 |
-| Informatik | 2.50 |
 
 ### Aufgabe 6
 
