@@ -41,6 +41,8 @@ FROM bestellungen
 JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id;
 ```
 
+> **Teste diese Abfrage** in DB Browser for SQLite. Wie viele Zeilen bekommst du? Bekommst du eine Gesamtsumme pro Schüler?
+
 **Was passiert?** Du bekommst für jeden Schüler *eine Zeile pro Bestellung* – also mehrere Zeilen pro Schüler, jede mit einem einzelnen Preis. Eine Gesamtsumme gibt es nicht.
 
 ```
@@ -65,6 +67,8 @@ SELECT COUNT(*) AS anzahl_schueler
 FROM schueler;
 ```
 
+> **Teste diese Abfrage.** Wie viele Zeilen enthält das Ergebnis? Was steht in der Spalte?
+
 Du kannst `COUNT` auch mit `WHERE` kombinieren:
 
 ```sql
@@ -72,6 +76,8 @@ SELECT COUNT(*) AS anzahl_bestellungen
 FROM bestellungen
 WHERE schueler_id = 1;
 ```
+
+> **Teste diese Abfrage.** Ändere anschließend die `schueler_id` auf einen anderen Wert – was ändert sich?
 
 ### Aufgabe 1
 
@@ -105,6 +111,8 @@ JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
 WHERE bestellungen.schueler_id = 1;
 ```
 
+> **Teste diese Abfrage.** Was passiert, wenn du das `* bestellungen.menge` weglässt? Vergleiche die Ergebnisse.
+
 ### Aufgabe 2
 
 Berechne den Gesamtumsatz der Kantine über **alle** Bestellungen.
@@ -135,6 +143,8 @@ SELECT AVG(note) AS durchschnittsnote
 FROM noten
 WHERE schueler_id = 1;
 ```
+
+> **Teste diese Abfrage.** Wie viele Nachkommastellen hat das Ergebnis? Teste anschließend `ROUND(AVG(note), 2)` – was ändert sich?
 
 > **Tipp:** Mit `ROUND(AVG(...), 2)` rundet man das Ergebnis auf 2 Nachkommastellen.
 
@@ -169,6 +179,8 @@ SELECT MIN(preis) AS guenstigstes,
        MAX(preis) AS teuerstes
 FROM produkte;
 ```
+
+> **Teste diese Abfrage.** Kannst du in der Tabelle `produkte` nachschauen, welche Produkte das genau sind?
 
 ### Aufgabe 4
 
@@ -215,6 +227,8 @@ JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
 GROUP BY bestellungen.schueler_id;
 ```
 
+> **Teste diese Abfrage.** Wie viele Zeilen liefert das Ergebnis? Vergleiche das mit der Abfrage *ohne* `GROUP BY` aus Abschnitt 3 – was ist der Unterschied?
+
 Jetzt bekommt jeder Schüler **eine eigene Zeile** mit seiner persönlichen Gesamtsumme.
 
 ### Aufgabe 5
@@ -249,6 +263,8 @@ FROM noten
 JOIN faecher ON noten.fach_id = faecher.fach_id
 GROUP BY noten.fach_id;
 ```
+
+> **Teste diese Abfrage.** Was würde passieren, wenn du `faecher.name` im `SELECT` hast, aber *nicht* in `GROUP BY`? Probiere es aus.
 
 ### Aufgabe 6
 
@@ -287,6 +303,8 @@ JOIN faecher ON noten.fach_id = faecher.fach_id
 GROUP BY noten.fach_id
 HAVING AVG(note) > 2.5;
 ```
+
+> **Teste diese Abfrage.** Wie viele Fächer erscheinen? Entferne anschließend die `HAVING`-Zeile – was ändert sich? Versuche außerdem, `HAVING AVG(note) > 2.5` durch `WHERE AVG(note) > 2.5` zu ersetzen – was passiert?
 
 Dieses Beispiel zeigt nur Fächer, deren Notendurchschnitt schlechter als 2,5 ist.
 
