@@ -1,7 +1,10 @@
-# SQL-Arbeitsblatt: Aggregatfunktionen
+# Kapitel 1: SQL-Aggregatfunktionen
 
 **Datenbank:** `schule.db` – öffne die Datei direkt mit *DB Browser for SQLite*  
 **Thema:** Aggregatfunktionen und `GROUP BY`
+
+> **Kursübersicht:**  
+> [Kapitel 1 – Aggregatfunktionen](README.md) · [Kapitel 2 – Verschachtelte Abfragen](Verschachteltes_SQL.md) · [Kapitel 3 – Schwache Entitäten im ER-Diagramm](Schwache_Entitaeten.md)
 
 ---
 
@@ -444,83 +447,4 @@ HAVING AVG(noten.note) < 2.8;
 
 ---
 
-## 10. Zum Grübeln
-
-### Aufgabe 12
-
-Welche Produkte kosten **mehr als der Durchschnittspreis** aller Produkte?  
-Gib Name und Preis aus.
-
-```sql
--- Deine Lösung:
-
-```
-
-<details>
-<summary>Lösung</summary>
-
-```sql
-SELECT name, preis
-FROM produkte
-WHERE preis > (SELECT AVG(preis) FROM produkte);
-```
-</details>
-
----
-
-### Aufgabe 13
-
-Welche Schülerinnen und Schüler haben einen **besseren Notendurchschnitt als der Gesamtdurchschnitt** aller Noten in der Datenbank?  
-Gib Vorname, Nachname und den persönlichen Durchschnitt aus.
-
-```sql
--- Deine Lösung:
-
-```
-
-<details>
-<summary>Lösung</summary>
-
-```sql
-SELECT schueler.vorname,
-       schueler.nachname,
-       ROUND(AVG(noten.note), 2) AS durchschnitt
-FROM noten
-JOIN schueler ON noten.schueler_id = schueler.schueler_id
-GROUP BY noten.schueler_id
-HAVING AVG(noten.note) < (SELECT AVG(note) FROM noten);
-```
-</details>
-
----
-
-### Aufgabe 14
-
-Welcher Schüler hat in der Kantine **am meisten Geld ausgegeben**?  
-Gib nur genau diesen einen Schüler mit seinem Namen und der Gesamtsumme aus.
-
-```sql
--- Deine Lösung:
-
-```
-
-<details>
-<summary>Lösung</summary>
-
-```sql
-SELECT schueler.vorname || ' ' || schueler.nachname AS name,
-       ROUND(SUM(produkte.preis * bestellungen.menge), 2) AS gesamtausgabe
-FROM bestellungen
-JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
-JOIN schueler ON bestellungen.schueler_id = schueler.schueler_id
-GROUP BY bestellungen.schueler_id
-HAVING gesamtausgabe = (
-    SELECT MAX(summe) FROM (
-        SELECT SUM(produkte.preis * bestellungen.menge) AS summe
-        FROM bestellungen
-        JOIN produkte ON bestellungen.produkt_id = produkte.produkt_id
-        GROUP BY bestellungen.schueler_id
-    )
-);
-```
-</details>
+> Weiter mit [Kapitel 2 – Verschachtelte Abfragen](Verschachteltes_SQL.md)
