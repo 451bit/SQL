@@ -21,7 +21,9 @@ from datetime import date
 # KONFIGURATION
 # ══════════════════════════════════════════════════════════════════
 
-DB_PFAD = "wetterdaten.db"   # Name (und Pfad) der SQLite-Datenbankdatei
+# Datenbankdatei im selben Ordner wie dieses Skript speichern,
+# unabhängig davon, von wo Python gestartet wird.
+DB_PFAD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "wetterdaten.db")
 
 
 # ══════════════════════════════════════════════════════════════════
