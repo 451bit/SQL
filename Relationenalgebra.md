@@ -42,7 +42,7 @@ bestellungen(bestell_id, schueler_id, produkt_id, datum, menge)
 | **π** | Projektion | Spalten auswählen | `SELECT` (ohne Duplikatentfernung) |
 | **⋈** | Verbund (Join) | Tabellen verknüpfen | `JOIN … ON …` |
 | **∪** | Vereinigung | Alle Zeilen beider Tabellen | `UNION` |
-| **−** | Differenz | Zeilen, die nur in der linken Tabelle stehen | `EXCEPT` |
+| **∖** | Differenz | Zeilen, die nur in der linken Tabelle stehen | `EXCEPT` |
 | **∩** | Durchschnitt | Zeilen, die in beiden Tabellen stehen | `INTERSECT` |
 | **×** | Kreuzprodukt | Alle Kombinationen zweier Tabellen | `FROM A, B` (ohne WHERE) |
 
@@ -304,23 +304,24 @@ SELECT klassenlehrer FROM klassen;
 
 ---
 
-## 7. Differenz – −
+## 7. Differenz – ∖
 
 ### Bedeutung
 
-Die **Differenz** $R - S$ enthält alle Zeilen aus $R$, die **nicht** in $S$ vorkommen.
+Die **Differenz** $R setminus S$ enthält alle Zeilen aus $R$, die **nicht** in $S$ vorkommen.
 
 **Voraussetzung:** Gleiche Schemata (wie bei der Vereinigung).
 
-$$R - S$$
+$$R setminus S$$
 
-> **Achtung:** Die Differenz ist **nicht kommutativ**: $R - S \neq S - R$
+> **Achtung:** Die Differenz ist **nicht kommutativ**: $R setminus S 
+eq S setminus R$
 
 ### Beispiel
 
 **Aufgabe:** Welche Schüler haben noch **keine** Note bekommen?
 
-$$\pi_{\text{schueler-id}}(\text{schueler}) - \pi_{\text{schueler-id}}(\text{noten})$$
+$$\pi_{\text{schueler-id}}(\text{schueler}) setminus pi_{\text{schueler-id}}(\text{noten})$$
 
 **Ausführungsreihenfolge:**
 1. `π` auf `schueler` → Tabelle mit allen Schüler-IDs
@@ -347,7 +348,7 @@ Der **Durchschnitt** (Schnittmenge) $R \cap S$ enthält alle Zeilen, die **sowoh
 $$R \cap S$$
 
 Der Durchschnitt kann auch durch die Differenz ausgedrückt werden:
-$$R \cap S = R - (R - S)$$
+$$R \cap S = R setminus (R setminus S)$$
 
 ### Beispiel
 
@@ -386,7 +387,7 @@ Wenn keine Klammern gesetzt sind, gilt folgende Priorität (von hoch zu niedrig)
 1. **σ, π** – unäre Operatoren (wirken auf eine Relation)
 2. **×, ⋈** – Kreuzprodukt und Verbund
 3. **∩** – Durchschnitt
-4. **∪, −** – Vereinigung und Differenz
+4. **∪, ∖** – Vereinigung und Differenz
 
 > **Empfehlung:** Setze im Zweifel immer **Klammern**, um die Reihenfolge eindeutig zu machen.
 
@@ -414,7 +415,7 @@ Schritt 3: `π_{vorname}(...)` → nur die Vornamen
 | $R \underset{R.x = S.y}{\bowtie} S$ | `FROM R JOIN S ON R.x = S.y` |
 | $R \times S$ | `FROM R, S` (ohne WHERE) |
 | $R \cup S$ | `... UNION ...` |
-| $R - S$ | `... EXCEPT ...` |
+| $R setminus S$ | `... EXCEPT ...` |
 | $R \cap S$ | `... INTERSECT ...` |
 | $\pi_B(\sigma_C(R))$ | `SELECT DISTINCT B FROM R WHERE C` |
 | $\pi_B(\sigma_C(R \bowtie S))$ | `SELECT DISTINCT B FROM R JOIN S ON … WHERE C` |
@@ -436,7 +437,7 @@ $$\sigma_{\text{note} = 1}(\text{noten})$$
 $$\pi_{\text{vorname},\, \text{nachname}}\bigl(\sigma_{\text{stufe} = 9}(\text{schueler} \underset{\text{schueler.klasse-id = klassen.klasse-id}}{\bowtie} \text{klassen})\bigr)$$
 
 **1c)**
-$$\pi_{\text{schueler-id}}(\text{schueler}) - \pi_{\text{schueler-id}}(\text{bestellungen})$$
+$$\pi_{\text{schueler-id}}(\text{schueler}) setminus pi_{\text{schueler-id}}(\text{bestellungen})$$
 
 **1d)**
 $$\pi_{\text{vorname},\, \text{nachname},\, \text{note}}\Bigl(\sigma_{\text{kuerzel} = \text{'M'} \,\wedge\, \text{art} = \text{'Klassenarbeit'}}\bigl((\text{schueler} \underset{\text{schueler.schueler-id = noten.schueler-id}}{\bowtie} \text{noten}) \underset{\text{noten.fach-id = faecher.fach-id}}{\bowtie} \text{faecher}\bigr)\Bigr)$$
@@ -551,7 +552,7 @@ $$\pi_{\text{vorname},\, \text{nachname},\, \text{bezeichnung}}\bigl(\text{schue
 $$\pi_{\text{vorname},\, \text{nachname}}\Bigl(\sigma_{\text{stufe} = 10 \,\wedge\, \text{geschlecht} = \text{'w'}}\bigl(\text{schueler} \underset{\text{schueler.klasse-id = klassen.klasse-id}}{\bowtie} \text{klassen}\bigr)\Bigr)$$
 
 **2e)**
-$$\pi_{\text{schueler-id}}(\text{bestellungen}) - \pi_{\text{schueler-id}}(\text{noten})$$
+$$\pi_{\text{schueler-id}}(\text{bestellungen}) setminus pi_{\text{schueler-id}}(\text{noten})$$
 
 </details>
 
@@ -570,7 +571,7 @@ $$\sigma_{\text{geschlecht} = \text{'m'} \,\wedge\, \text{klasse-id} = 2}(\text{
 $$\pi_{\text{klassenlehrer}}(\text{klassen})$$
 
 **3c)**
-$$\pi_{\text{schueler-id}}(\text{schueler}) - \pi_{\text{schueler-id}}(\text{noten})$$
+$$\pi_{\text{schueler-id}}(\text{schueler}) setminus pi_{\text{schueler-id}}(\text{noten})$$
 
 **3d)**
 $$\pi_{\text{vorname},\, \text{nachname}}\Bigl(\sigma_{\text{note} \leq 2}\bigl(\text{schueler} \underset{\text{schueler.schueler-id = noten.schueler-id}}{\bowtie} \text{noten}\bigr)\Bigr)$$
@@ -648,7 +649,7 @@ Formuliere einen Relationenalgebra-Ausdruck für die folgenden Aufgaben. Gib ans
 <summary>Lösungen Aufgabe 5</summary>
 
 **5a)**
-$$\pi_{\text{produkt-id}}\bigl(\sigma_{\text{preis} > 3{,}00}(\text{produkte})\bigr) - \pi_{\text{produkt-id}}(\text{bestellungen})$$
+$$\pi_{\text{produkt-id}}\bigl(\sigma_{\text{preis} > 3{,}00}(\text{produkte})\bigr) setminus pi_{\text{produkt-id}}(\text{bestellungen})$$
 
 ```sql
 SELECT produkt_id FROM produkte WHERE preis > 3.00
