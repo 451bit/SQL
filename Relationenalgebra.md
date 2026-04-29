@@ -190,7 +190,7 @@ Verknüpft alle Tupel aus $R$ und $S$, für die die Bedingung gilt. Beide Fremds
 
 Spezialfall des Theta-Verbunds: Die Bedingung ist eine Gleichheit.
 
-$$\text{schueler} \underset{\text{schueler.klasse\_id} = \text{klassen.klasse\_id}}{\bowtie} \text{klassen}$$
+$$\text{schueler} \underset{\text{schueler.klasse-id} = \text{klassen.klasse-id}}{\bowtie} \text{klassen}$$
 
 #### c) Natural Join (natürlicher Verbund)
 
@@ -203,7 +203,7 @@ Verbindet automatisch über **alle gleichnamigen Spalten** und entfernt eine der
 **Aufgabe:** Schüler zusammen mit ihrer Klassenbezeichnung anzeigen.
 
 **Relationenalgebra:**
-$$\text{schueler} \underset{\text{schueler.klasse\_id} = \text{klassen.klasse\_id}}{\bowtie} \text{klassen}$$
+$$\text{schueler} \underset{\text{schueler.klasse-id} = \text{klassen.klasse-id}}{\bowtie} \text{klassen}$$
 
 **Ergebnis:** Eine Tabelle mit allen Spalten aus `schueler` und `klassen` (wobei `klasse_id` doppelt vorkommt).
 
@@ -221,7 +221,7 @@ JOIN klassen ON schueler.klasse_id = klassen.klasse_id;
 **Aufgabe:** Vorname, Nachname und Klassenbezeichnung aller Schüler der Stufe 10.
 
 **Relationenalgebra:**
-$$\pi_{\text{vorname},\, \text{nachname},\, \text{bezeichnung}}\Bigl(\sigma_{\text{stufe} = 10}\bigl(\text{schueler} \underset{\text{schueler.klasse\_id} = \text{klassen.klasse\_id}}{\bowtie} \text{klassen}\bigr)\Bigr)$$
+$$\pi_{\text{vorname},\, \text{nachname},\, \text{bezeichnung}}\Bigl(\sigma_{\text{stufe} = 10}\bigl(\text{schueler} \underset{\text{schueler.klasse-id} = \text{klassen.klasse-id}}{\bowtie} \text{klassen}\bigr)\Bigr)$$
 
 **Ausführungsreihenfolge:**
 1. **⋈** verbindet `schueler` und `klassen`
@@ -243,7 +243,7 @@ WHERE stufe = 10;
 **Aufgabe:** Vorname, Nachname und Fachnamen aller Noten, die schlechter als 3 sind.
 
 **Relationenalgebra:**
-$$\pi_{\text{vorname},\, \text{nachname},\, \text{faecher.name}}\Bigl(\sigma_{\text{note} > 3}\bigl((\text{schueler} \underset{\text{schueler.schueler\_id} = \text{noten.schueler\_id}}{\bowtie} \text{noten}) \underset{\text{noten.fach\_id} = \text{faecher.fach\_id}}{\bowtie} \text{faecher}\bigr)\Bigr)$$
+$$\pi_{\text{vorname},\, \text{nachname},\, \text{faecher.name}}\Bigl(\sigma_{\text{note} > 3}\bigl((\text{schueler} \underset{\text{schueler.schueler-id} = \text{noten.schueler-id}}{\bowtie} \text{noten}) \underset{\text{noten.fach-id} = \text{faecher.fach-id}}{\bowtie} \text{faecher}\bigr)\Bigr)$$
 
 **SQL:**
 ```sql
@@ -320,7 +320,7 @@ $$R - S$$
 
 **Aufgabe:** Welche Schüler haben noch **keine** Note bekommen?
 
-$$\pi_{\text{schueler\_id}}(\text{schueler}) - \pi_{\text{schueler\_id}}(\text{noten})$$
+$$\pi_{\text{schueler-id}}(\text{schueler}) - \pi_{\text{schueler-id}}(\text{noten})$$
 
 **Ausführungsreihenfolge:**
 1. `π` auf `schueler` → Tabelle mit allen Schüler-IDs
@@ -358,7 +358,7 @@ Schüler mit Mathe-Note:    π_{schueler_id}(σ_{fach_id = 1}(noten))
 Schüler mit Deutsch-Note:  π_{schueler_id}(σ_{fach_id = 2}(noten))
 ```
 
-$$\pi_{\text{schueler\_id}}\bigl(\sigma_{\text{fach\_id} = 1}(\text{noten})\bigr) \cap \pi_{\text{schueler\_id}}\bigl(\sigma_{\text{fach\_id} = 2}(\text{noten})\bigr)$$
+$$\pi_{\text{schueler-id}}\bigl(\sigma_{\text{fach-id} = 1}(\text{noten})\bigr) \cap \pi_{\text{schueler-id}}\bigl(\sigma_{\text{fach-id} = 2}(\text{noten})\bigr)$$
 
 **SQL:**
 ```sql
@@ -397,7 +397,7 @@ Beim Lesen eines komplexen Ausdrucks:
 2. Arbeite dich **von innen nach außen** vor.
 
 **Beispiel:**
-$$\pi_{\text{vorname}}\Bigl(\sigma_{\text{stufe}=9}\bigl(\text{schueler} \underset{\text{schueler.klasse\_id = klassen.klasse\_id}}{\bowtie} \text{klassen}\bigr)\Bigr)$$
+$$\pi_{\text{vorname}}\Bigl(\sigma_{\text{stufe}=9}\bigl(\text{schueler} \underset{\text{schueler.klasse-id = klassen.klasse-id}}{\bowtie} \text{klassen}\bigr)\Bigr)$$
 
 Schritt 1: `schueler ⋈ klassen` → verbundene Tabelle  
 Schritt 2: `σ_{stufe=9}(...)` → nur Stufe-9-Schüler  
@@ -433,16 +433,16 @@ Schritt 3: `π_{vorname}(...)` → nur die Vornamen
 $$\sigma_{\text{note} = 1}(\text{noten})$$
 
 **1b)**
-$$\pi_{\text{vorname},\, \text{nachname}}\bigl(\sigma_{\text{stufe} = 9}(\text{schueler} \underset{\text{schueler.klasse\_id = klassen.klasse\_id}}{\bowtie} \text{klassen})\bigr)$$
+$$\pi_{\text{vorname},\, \text{nachname}}\bigl(\sigma_{\text{stufe} = 9}(\text{schueler} \underset{\text{schueler.klasse-id = klassen.klasse-id}}{\bowtie} \text{klassen})\bigr)$$
 
 **1c)**
-$$\pi_{\text{schueler\_id}}(\text{schueler}) - \pi_{\text{schueler\_id}}(\text{bestellungen})$$
+$$\pi_{\text{schueler-id}}(\text{schueler}) - \pi_{\text{schueler-id}}(\text{bestellungen})$$
 
 **1d)**
-$$\pi_{\text{vorname},\, \text{nachname},\, \text{note}}\Bigl(\sigma_{\text{kuerzel} = \text{'M'} \,\wedge\, \text{art} = \text{'Klassenarbeit'}}\bigl((\text{schueler} \underset{\text{schueler.schueler\_id = noten.schueler\_id}}{\bowtie} \text{noten}) \underset{\text{noten.fach\_id = faecher.fach\_id}}{\bowtie} \text{faecher}\bigr)\Bigr)$$
+$$\pi_{\text{vorname},\, \text{nachname},\, \text{note}}\Bigl(\sigma_{\text{kuerzel} = \text{'M'} \,\wedge\, \text{art} = \text{'Klassenarbeit'}}\bigl((\text{schueler} \underset{\text{schueler.schueler-id = noten.schueler-id}}{\bowtie} \text{noten}) \underset{\text{noten.fach-id = faecher.fach-id}}{\bowtie} \text{faecher}\bigr)\Bigr)$$
 
 **1e)**
-$$\pi_{\text{schueler\_id}}\bigl(\sigma_{\text{fach\_id} = 1}(\text{noten})\bigr) \cap \pi_{\text{schueler\_id}}\bigl(\sigma_{\text{fach\_id} = 3}(\text{noten})\bigr)$$
+$$\pi_{\text{schueler-id}}\bigl(\sigma_{\text{fach-id} = 1}(\text{noten})\bigr) \cap \pi_{\text{schueler-id}}\bigl(\sigma_{\text{fach-id} = 3}(\text{noten})\bigr)$$
 
 ---
 
@@ -545,13 +545,13 @@ $$\sigma_{\text{preis} < 2{,}00}(\text{produkte})$$
 $$\pi_{\text{name},\, \text{preis}}\bigl(\sigma_{\text{kategorie} = \text{'Getränk'}}(\text{produkte})\bigr)$$
 
 **2c)**
-$$\pi_{\text{vorname},\, \text{nachname},\, \text{bezeichnung}}\bigl(\text{schueler} \underset{\text{schueler.klasse\_id = klassen.klasse\_id}}{\bowtie} \text{klassen}\bigr)$$
+$$\pi_{\text{vorname},\, \text{nachname},\, \text{bezeichnung}}\bigl(\text{schueler} \underset{\text{schueler.klasse-id = klassen.klasse-id}}{\bowtie} \text{klassen}\bigr)$$
 
 **2d)**
-$$\pi_{\text{vorname},\, \text{nachname}}\Bigl(\sigma_{\text{stufe} = 10 \,\wedge\, \text{geschlecht} = \text{'w'}}\bigl(\text{schueler} \underset{\text{schueler.klasse\_id = klassen.klasse\_id}}{\bowtie} \text{klassen}\bigr)\Bigr)$$
+$$\pi_{\text{vorname},\, \text{nachname}}\Bigl(\sigma_{\text{stufe} = 10 \,\wedge\, \text{geschlecht} = \text{'w'}}\bigl(\text{schueler} \underset{\text{schueler.klasse-id = klassen.klasse-id}}{\bowtie} \text{klassen}\bigr)\Bigr)$$
 
 **2e)**
-$$\pi_{\text{schueler\_id}}(\text{bestellungen}) - \pi_{\text{schueler\_id}}(\text{noten})$$
+$$\pi_{\text{schueler-id}}(\text{bestellungen}) - \pi_{\text{schueler-id}}(\text{noten})$$
 
 </details>
 
@@ -564,16 +564,16 @@ Beschreibe in einem vollständigen deutschen Satz, was der folgende Ausdruck inh
 ---
 
 **3a)**
-$$\sigma_{\text{geschlecht} = \text{'m'} \,\wedge\, \text{klasse\_id} = 2}(\text{schueler})$$
+$$\sigma_{\text{geschlecht} = \text{'m'} \,\wedge\, \text{klasse-id} = 2}(\text{schueler})$$
 
 **3b)**
 $$\pi_{\text{klassenlehrer}}(\text{klassen})$$
 
 **3c)**
-$$\pi_{\text{schueler\_id}}(\text{schueler}) - \pi_{\text{schueler\_id}}(\text{noten})$$
+$$\pi_{\text{schueler-id}}(\text{schueler}) - \pi_{\text{schueler-id}}(\text{noten})$$
 
 **3d)**
-$$\pi_{\text{vorname},\, \text{nachname}}\Bigl(\sigma_{\text{note} \leq 2}\bigl(\text{schueler} \underset{\text{schueler.schueler\_id = noten.schueler\_id}}{\bowtie} \text{noten}\bigr)\Bigr)$$
+$$\pi_{\text{vorname},\, \text{nachname}}\Bigl(\sigma_{\text{note} \leq 2}\bigl(\text{schueler} \underset{\text{schueler.schueler-id = noten.schueler-id}}{\bowtie} \text{noten}\bigr)\Bigr)$$
 
 **3e)**
 $$\pi_{\text{name}}\bigl(\sigma_{\text{kategorie} = \text{'Hauptgericht'}}(\text{produkte})\bigr) \cup \pi_{\text{name}}\bigl(\sigma_{\text{kategorie} = \text{'Dessert'}}(\text{produkte})\bigr)$$
@@ -605,7 +605,7 @@ Ergebnisspalten: `name`.
 
 Nummeriere die Operationen des folgenden Ausdrucks in der Reihenfolge, in der sie ausgeführt werden (1 = zuerst):
 
-$$\pi_{\text{vorname},\, \text{note}}\Bigl(\sigma_{\text{bezeichnung} = \text{'10a'} \,\wedge\, \text{note} < 3}\bigl(\text{schueler} \underset{\text{schueler.klasse\_id = klassen.klasse\_id}}{\bowtie} \text{klassen} \underset{\text{schueler.schueler\_id = noten.schueler\_id}}{\bowtie} \text{noten}\bigr)\Bigr)$$
+$$\pi_{\text{vorname},\, \text{note}}\Bigl(\sigma_{\text{bezeichnung} = \text{'10a'} \,\wedge\, \text{note} < 3}\bigl(\text{schueler} \underset{\text{schueler.klasse-id = klassen.klasse-id}}{\bowtie} \text{klassen} \underset{\text{schueler.schueler-id = noten.schueler-id}}{\bowtie} \text{noten}\bigr)\Bigr)$$
 
 <details>
 <summary>Lösung Aufgabe 4</summary>
@@ -648,7 +648,7 @@ Formuliere einen Relationenalgebra-Ausdruck für die folgenden Aufgaben. Gib ans
 <summary>Lösungen Aufgabe 5</summary>
 
 **5a)**
-$$\pi_{\text{produkt\_id}}\bigl(\sigma_{\text{preis} > 3{,}00}(\text{produkte})\bigr) - \pi_{\text{produkt\_id}}(\text{bestellungen})$$
+$$\pi_{\text{produkt-id}}\bigl(\sigma_{\text{preis} > 3{,}00}(\text{produkte})\bigr) - \pi_{\text{produkt-id}}(\text{bestellungen})$$
 
 ```sql
 SELECT produkt_id FROM produkte WHERE preis > 3.00
@@ -657,7 +657,7 @@ SELECT produkt_id FROM bestellungen;
 ```
 
 **5b)**
-$$\pi_{\text{vorname},\, \text{nachname},\, \text{bezeichnung}}\Bigl(\sigma_{\text{geschlecht} = \text{'w'} \,\wedge\, \text{stufe} = 9}\bigl(\text{schueler} \underset{\text{schueler.klasse\_id = klassen.klasse\_id}}{\bowtie} \text{klassen}\bigr)\Bigr)$$
+$$\pi_{\text{vorname},\, \text{nachname},\, \text{bezeichnung}}\Bigl(\sigma_{\text{geschlecht} = \text{'w'} \,\wedge\, \text{stufe} = 9}\bigl(\text{schueler} \underset{\text{schueler.klasse-id = klassen.klasse-id}}{\bowtie} \text{klassen}\bigr)\Bigr)$$
 
 ```sql
 SELECT vorname, nachname, bezeichnung
@@ -667,7 +667,7 @@ WHERE geschlecht = 'w' AND stufe = 9;
 ```
 
 **5c)**
-$$\pi_{\text{faecher.name}}\Bigl(\sigma_{\text{note} = 6}\bigl(\text{noten} \underset{\text{noten.fach\_id = faecher.fach\_id}}{\bowtie} \text{faecher}\bigr)\Bigr)$$
+$$\pi_{\text{faecher.name}}\Bigl(\sigma_{\text{note} = 6}\bigl(\text{noten} \underset{\text{noten.fach-id = faecher.fach-id}}{\bowtie} \text{faecher}\bigr)\Bigr)$$
 
 ```sql
 SELECT DISTINCT faecher.name
@@ -677,7 +677,7 @@ WHERE note = 6;
 ```
 
 **5d)**
-$$\pi_{\text{schueler\_id}}(\text{bestellungen}) \cap \pi_{\text{schueler\_id}}(\text{noten})$$
+$$\pi_{\text{schueler-id}}(\text{bestellungen}) \cap \pi_{\text{schueler-id}}(\text{noten})$$
 
 ```sql
 SELECT schueler_id FROM bestellungen
